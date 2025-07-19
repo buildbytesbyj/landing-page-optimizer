@@ -1,49 +1,46 @@
 import streamlit as st
-import streamlit as st
 import cohere
 
-cohere_api_key = st.secrets["COHERE_API_KEY"]
-co = cohere.Client(cohere_api_key)
+# --- SETUP ---
+st.set_page_config(page_title="Landing Page Copy Optimizer", page_icon="📝")
+st.title("📝 Landing Page Copy Optimizer GPT")
+st.caption("Paste your landing page content and get AI-powered optimized copy using Cohere!")
 
+# --- INIT COHERE ---
+co = cohere.Client(st.secrets["COHERE_API_KEY"])
 
-# --- Page config ---
-st.set_page_config(page_title="Landing Page Copy Optimizer GPT", page_icon="📝")
-st.title("📝 Landing Page Copy Optimizer GPT (Cohere)")
-st.write("Paste your landing page content and get AI-powered optimized copy using Cohere!")
+# --- UI Elements ---
+lp_text = st.text_area("Paste your current landing page copy:", height=200)
 
-# --- API Key ---
-api_key = st.secrets["COHERE_API_KEY"] if "COHERE_API_KEY" in st.secrets else st.text_input("Enter your Cohere API key", type="password")
+tone = st.selectbox("Choose tone/style:", ["Professional", "Friendly", "Persuasive", "Minimalist", "SEO-focused"])
 
-# --- Inputs ---
-lp_text = st.text_area("📋 Paste your current landing page copy:", height=200)
-tone = st.selectbox("🎯 Choose tone/style:", ["Professional", "Friendly", "Persuasive", "Minimalist", "SEO-focused"])
-optimize_goal = st.radio("💡 Optimize for:", ["More conversions", "Better clarity", "User trust", "SEO ranking"])
+optimize_goal = st.radio("Optimize for:", ["More conversions", "Better clarity", "User trust", "SEO ranking"])
+
 submit = st.button("✨ Optimize Now")
 
-# --- Cohere Processing ---
-if submit and lp_text and api_key:
-    co = cohere.Client(api_key)
-    with st.spinner("Generating optimized copy..."):
-        prompt = f"""
-You are a professional AI content strategist and UX copywriting expert.
+# --- Generate Response ---
+if submit and lp_text:
+    with st.spinner("Optimizing your copy..."):
 
-Your task is to rewrite the following landing page copy to improve: {optimize_goal}.
+        prompt = f"""
+You are an expert in UX writing and AI content strategy.
+
+Rewrite the following landing page copy to be optimized for: {optimize_goal}.
 Use a {tone.lower()} tone.
-Keep it concise: limit to 3–4 impactful sentences max.
-Ensure it's clear, persuasive, and easy to understand.
+Keep it short, impactful, and conversion-optimized.
 
 Landing Page Copy:
 \"\"\"{lp_text}\"\"\"
 """
 
-
         try:
             response = co.generate(
-                model="command-r-plus",
+                model="command-light",
                 prompt=prompt,
-                max_tokens=150,
-                temperature=0.7
+                max_tokens=300,
+                temperature=0.7,
             )
+
             optimized_text = response.generations[0].text.strip()
             st.subheader("🚀 Optimized Landing Page Copy")
             st.success(optimized_text)
