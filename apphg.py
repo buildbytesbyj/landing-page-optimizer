@@ -1,5 +1,10 @@
 import streamlit as st
+import streamlit as st
 import cohere
+
+cohere_api_key = st.secrets["COHERE_API_KEY"]
+co = cohere.Client(cohere_api_key)
+
 
 # --- Page config ---
 st.set_page_config(page_title="Landing Page Copy Optimizer GPT", page_icon="📝")
